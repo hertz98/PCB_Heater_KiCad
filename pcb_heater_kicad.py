@@ -24,6 +24,8 @@ length=0
 net=0
 space=0.5
 layer="F.Cu"
+resistivity=1.72E-5 #Ω*mm
+thickness=0.035
 
 #Up current directory
 directory=str(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +33,7 @@ os.chdir(directory)
 
 def Help(out):
 	print(os.path.basename(__file__) +' -x <size of X> -y <size of Y> -w <size of width> -l <name of layer> -n <number of net> -s <space between wires>')
-	print("All options are optionnal, default is size X=10mm, Y=10mm, width=0.25mm, net=0, space=0.5mm, layer=F.Cu")
+	print("All options are optionnal, default is size X=10mm, Y=10mm, width=0.25mm, thickness=0.035mm, net=0, space=0.5mm, layer=F.Cu, resistivity=1.68E-8Ωm")
 	print("Example : '"+os.path.basename(__file__) +" -x 10.0 -y 20.5'")
 	print("  will create a sample of track resistor heater (10×20.5mm²)")
 	print("  called test.kicad_pcb in the current folder,")
@@ -53,8 +55,10 @@ def main(argv):
 	global space
 	global layer
 	global kicadFile
+	global resistivity
+	global thickness
 	try:
-		opts, args = getopt.getopt(argv,"hx:y:X:Y:w:W:n:N:s:S:l:L",["help=", "width", "net", "space", "layer"])
+		opts, args = getopt.getopt(argv,"hx:y:X:Y:w:W:n:N:s:S:l:L:t:T:r:R",["help=", "width", "net", "space", "layer", "thickness", "resistivity"])
 	except getopt.GetoptError:
 		Help(2)
 	for opt, arg in opts:
@@ -88,14 +92,26 @@ def main(argv):
 				layer = arg
 			except:
 				Help(2)
+		elif opt in ("-t", "-T", "--thickness"):
+			try:
+				thickness = float(arg)
+			except:
+				Help(2)
+		elif opt in ("-r", "-R", "--resistivity"):
+			try:
+				resistivity = float(arg) * 1E3
+			except:
+				Help(2)
 		else:
 			Help(0)
 	print("Size of X="+str(sizeX)+"mm")
 	print("Size of Y="+str(sizeY)+"mm")
 	print("width of wire="+str(width)+"mm")
+	print("thickness of wire="+str(thickness)+"mm")
 	print("Space between tracks="+str(space)+"mm")
 	print("net number="+str(net))
 	print("layer="+layer)
+	print("copper resistivity="+str(resistivity)+"Ωmm")
 	
 	#Create a new file kicad_pcb:
 	shutil.copy("Project/init_pcb","Project/test.kicad_pcb")
@@ -131,9 +147,10 @@ if __name__ == "__main__":
 	main(sys.argv[1:])
 	print("---------------------------------------------")
 	print("   Size of heater = "+str(length)+"mm.")
+	print("   Resistance at 25°C = " + str( resistivity * length / (width * thickness) ) + "Ω." )
 	print("---------------------------------------------")
 	try:
-		launchKicad = raw_input("Open KiCad (Y/n) :")
+		launchKicad = input("Open KiCad (Y/n) :")
 	except:
 		launchKicad = 'y'
 	if launchKicad!='n' and launchKicad!='N':

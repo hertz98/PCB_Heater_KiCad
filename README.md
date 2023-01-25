@@ -2,7 +2,8 @@
 Python script to generate a PCB resistor heater for KiCad using tracks.
 
 ## What does it do :  
-Create a sample 'test.kicad\_pcb' file in Project. If you have KiCad installed, you can see the result at the end of the execution.
+Create a sample 'test.kicad\_pcb' file in Project. If you have KiCad installed, you can see the result at the end of the execution. 
+It does a resistance estimation of the generated track.
 
 ## How does it work :
     pcb_heater_kicad.py -x 10 -y 20
